@@ -8,7 +8,7 @@ Example:
     python computeSales.py priceCatalogue.json salesRecord.json
 """
 
-import sys
+import argparse
 import time
 from typing import Dict, List, Tuple
 
@@ -121,17 +121,31 @@ def display_results(output: str) -> None:
     pass
 
 
-def validate_arguments(args: List[str]) -> bool:
+def parse_arguments():
     """
-    Validate command line arguments.
-
-    Args:
-        args: List of command line arguments
+    Parse command line arguments using argparse.
 
     Returns:
-        True if arguments are valid, False otherwise
+        Namespace object with parsed arguments
     """
-    pass
+    parser = argparse.ArgumentParser(
+        description='Compute total cost of sales based on price and sales records.',
+        epilog='Example: python computeSales.py price.json sales.json'
+    )
+    
+    parser.add_argument(
+        'price_file',
+        type=str,
+        help='Path to the price JSON file'
+    )
+    
+    parser.add_argument(
+        'sales_file',
+        type=str,
+        help='Path to the sales JSON file'
+    )
+    
+    return parser.parse_args()
 
 
 def main():
@@ -140,27 +154,26 @@ def main():
     """
     start_time = time.time()
     
-    if not validate_arguments(sys.argv):
-        print("Usage: python computeSales.py prices.json sales.json")
-        sys.exit(1)
+    # Parse command line arguments
+    args = parse_arguments()
     
-    price_file = sys.argv[1]
-    sales_file = sys.argv[2]
+    price_file = args.price_catalogue
+    sales_file = args.sales_record
     
     all_errors = []
     
     try:
-        price_dict= load_price_catalogue(price_file)
+        prices_dict = load_price_catalogue(price_file)
     except Exception as e:
         print(f"Error loading price file: {e}")
         all_errors.append(f"Price file error: {e}")
-        prices_dict= {}
+        prices_dict = {}
     
     try:
         sales = load_sales_record(sales_file)
     except Exception as e:
         print(f"Error loading sales file: {e}")
-        all_errors.append(f"Sales file file: {e}")
+        all_errors.append(f"Sales file error: {e}")
         sales = []
     
     total, sales_count, computation_errors = compute_all_sales(
