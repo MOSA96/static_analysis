@@ -75,13 +75,13 @@ def load_sales_record(filename: str) -> List:
     return load_json_file(filename)
 
 
-def compute_sale_total(sales_dict: Dict, prices_dict: Dict) -> Tuple[float, List[str]]:
+def compute_sale_total(sale: Dict, prices_dict: Dict) -> Tuple[float, List[str]]:
     """
     Compute the total cost for a single sale.
 
     Args:
         sale: Dictionary containing sale information
-        sales_dict: Dictionary with product prices
+        prices_dict: Dictionary with product prices
 
     Returns:
         Tuple of (total_cost, list_of_errors)
@@ -90,18 +90,19 @@ def compute_sale_total(sales_dict: Dict, prices_dict: Dict) -> Tuple[float, List
     total = 0.0
 
     try:
-        sale_id = sales_dict.get("SALE_ID", "Unknown")
-        sale_data = sales_dict.get("SALE_Date", "Unknown")
-        product = sales_dict.get("Product", None)
-        quantity = sales_dict.get("Quantity", None)
+        sale_id = sale.get("SALE_ID", "Unknown")
+        product = sale.get("Product", None)
+        quantity = sale.get("Quantity", None)
 
-        #validation
+        # validation
         if product is None:
             errors.append(f"Missing product information")
-        
+            return 0.0, errors
+
         if quantity is None:
             errors.append(f"Missing quantity information")
-        
+            return 0.0, errors
+
         try:
             quantity = float(quantity)
             if quantity < 0:
@@ -111,7 +112,11 @@ def compute_sale_total(sales_dict: Dict, prices_dict: Dict) -> Tuple[float, List
             errors.append(f"Sale {sale_id}: Invalid quantity value ({quantity})")
             return 0.0, errors
 
-        price = sales_dict[product]
+        if product not in prices_dict:
+            errors.append(f"Sale {sale_id}: Product '{product}' not found in price catalogue")
+            return 0.0, errors
+
+        price = prices_dict[product]
         try:
             price = float(price)
             if price < 0:
@@ -124,7 +129,7 @@ def compute_sale_total(sales_dict: Dict, prices_dict: Dict) -> Tuple[float, List
         total = price * quantity
 
     except Exception as e:
-        errors.append(f"Sale {sales_dict.get("Sale", "Unknown")}: Unexpected error - {str(e)}")
+        errors.append(f"Sale {sale.get('Sale', 'Unknown')}: Unexpected error - {str(e)}")
         return 0.0, errors
 
     return total, errors
