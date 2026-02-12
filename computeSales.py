@@ -50,7 +50,7 @@ def load_price_catalogue(filename: str) -> Dict:
     Returns:
         Dictionary containing product prices
     """
-    pass
+    return load_json_file(filename)
 
 
 def load_sales_record(filename: str) -> List:
@@ -63,7 +63,7 @@ def load_sales_record(filename: str) -> List:
     Returns:
         List of sales transactions
     """
-    pass
+    return load_json_file(filename)
 
 
 def compute_sale_total(sale: Dict, sales_dict: Dict) -> Tuple[float, List[str]]:
