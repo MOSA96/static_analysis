@@ -50,7 +50,16 @@ def load_price_catalogue(filename: str) -> Dict:
     Returns:
         Dictionary containing product prices
     """
-    return load_json_file(filename)
+    data = load_json_file(filename)
+
+    if isinstance(data, list):
+        price_dict = {}
+        for item in data:
+            if isinstance(item, dict) and 'title' in item and 'price' in item:
+                price_dict[item['title']] = item['price']
+        return price_dict
+
+    return data
 
 
 def load_sales_record(filename: str) -> List:
