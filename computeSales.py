@@ -136,40 +136,39 @@ def compute_sale_total(sale: Dict, prices_dict: Dict) -> Tuple[float, List[str]]
         
 
     
-def compute_all_sales(sales_records: List, sales_dict: Dict) -> Tuple[float, int, List[str]]:
+def compute_all_sales(sales_records: List, prices_dict: Dict) -> Tuple[float, List[str]]:
     """
     Compute total cost for all sales.
 
     Args:
         sales_records: List of all sales transactions
-        sales_dict: Dictionary with product prices
+        prices_dict: Dictionary with product prices
 
     Returns:
-        Tuple of (grand_total, successful_sales_count, list_of_errors)
+        Tuple of (grand_total, list_of_errors)
     """
     total = 0.0
     errors = []
 
     if not isinstance(sales_records, list):
         errors.append("Sales records is not a list")
-        return 0.0, 0, errors
-    
-    if not isinstance(sales_dict, dict):
-        errors.append("Sales dict is not a dict")
-        return 0.0, 0, errors
-    
+        return 0.0, errors
+
+    if not isinstance(prices_dict, dict):
+        errors.append("Prices dict is not a dict")
+        return 0.0, errors
+
     for idx, sale in enumerate(sales_records):
         if not isinstance(sale, dict):
             errors.append(f"Sale number {idx} is not a dict")
             continue
-        
-        sale_total, errors = compute_sale_total(sale, sales_dict)
 
-        if errors:
-            errors.extend(errors)
-        else: 
+        sale_total, sale_errors = compute_sale_total(sale, prices_dict)
+
+        if sale_errors:
+            errors.extend(sale_errors)
+        else:
             total += sale_total
-
 
     return total, errors
 
@@ -268,8 +267,8 @@ def main():
     # Parse command line arguments
     args = parse_arguments()
     
-    price_file = args.price_catalogue
-    sales_file = args.sales_record
+    price_file = args.price_file
+    sales_file = args.sales_file
     
     all_errors = []
     
