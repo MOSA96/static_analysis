@@ -10,6 +10,7 @@ Example:
 
 import argparse
 import time
+import json
 from typing import Dict, List, Tuple
 
 
@@ -27,7 +28,16 @@ def load_json_file(filename: str) -> Dict:
         FileNotFoundError: If file doesn't exist
         json.JSONDecodeError: If JSON is malformed
     """
-    pass
+    try:
+        with open(filename, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            return data
+    except FileNotFoundError:
+        raise FileNotFoundError(f'File not found {filename}')
+    except json.JSONDecodeError as e:
+        raise json.JSONDecodeError(
+            f'Invalid JSON format for {filename}: {e.msg}'
+        )
 
 
 def load_price_catalogue(filename: str) -> Dict:
