@@ -121,10 +121,7 @@ def compute_sale_total(sales_dict: Dict, prices_dict: Dict) -> Tuple[float, List
     return total, errors
         
 
-        
-
-
-
+    
 def compute_all_sales(sales_records: List, sales_dict: Dict) -> Tuple[float, int, List[str]]:
     """
     Compute total cost for all sales.
@@ -136,11 +133,35 @@ def compute_all_sales(sales_records: List, sales_dict: Dict) -> Tuple[float, int
     Returns:
         Tuple of (grand_total, successful_sales_count, list_of_errors)
     """
-    pass
+    total = 0.0
+    errors = []
+
+    if not isinstance(sales_records, list):
+        errors.append("Sales records is not a list")
+        return 0.0, 0, errors
+    
+    if not isinstance(sales_dict, dict):
+        errors.append("Sales dict is not a dict")
+        return 0.0, 0, errors
+    
+    for idx, sale in enumerate(sales_records):
+        if not isinstance(sale, dict):
+            errors.append(f"Sale number {idx} is not a dict")
+            continue
+        
+        sale_total, errors = compute_sale_total(sale, sales_dict)
+
+        if errors:
+            errors.extend(errors)
+        else: 
+            total += sale_total
 
 
-def format_output(total: float, sales_count: int, 
-                  execution_time: float) -> str:
+    return total, errors
+
+
+def format_output(total: float, execution_time: float, 
+                  errors: list[str]) -> str:
     """
     Format the results in a human-readable format.
 
@@ -152,7 +173,27 @@ def format_output(total: float, sales_count: int,
     Returns:
         Formatted string for output
     """
-    pass
+    if errors is None:
+        errors = []
+
+    output_lines = []
+    output_lines.append("=" * 60)
+    output_lines.append("RESULTS")
+    output_lines.append("")
+    output_lines.append(f"Total Sales: ${total:,.2f}")
+    output_lines.append(f"Execution Time: {execution_time:.4f} seconds")
+    output_lines.append("")
+
+    if errors:
+        output_lines.append("=" * 60)
+        output_lines.append(f"ERRORS ENCOUNTERED: {len(errors)}")
+        
+        for idx, error in enumerate(errors, 1):
+            output_lines.append(f'{idx}: {error}')
+        output_lines.append("")
+
+    return "\n".join(output_lines)
+
 
 
 def write_results_to_file(output: str, filename: str = "SalesResults.txt") -> None:
