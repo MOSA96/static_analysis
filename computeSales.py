@@ -204,7 +204,8 @@ def write_results_to_file(output: str, filename: str = "SalesResults.txt") -> No
         output: Formatted output string
         filename: Name of the output file (default: SalesResults.txt)
     """
-    pass
+    with open(filename, 'w', encoding='utf-8') as file:
+        file.write(output)
 
 
 def display_results(output: str) -> None:
@@ -214,7 +215,7 @@ def display_results(output: str) -> None:
     Args:
         output: Formatted output string
     """
-    pass
+    print(output)
 
 
 def parse_arguments():
