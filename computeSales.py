@@ -273,7 +273,7 @@ def main():
         all_errors.append(f"Sales file error: {e}")
         sales = []
     
-    total, sales_count, computation_errors = compute_all_sales(
+    total, computation_errors = compute_all_sales(
         sales, prices_dict
     )
     all_errors.extend(computation_errors)
@@ -281,7 +281,7 @@ def main():
     end_time = time.time()
     execution_time = end_time - start_time
     
-    output = format_output(total, sales_count, execution_time, all_errors)
+    output = format_output(total, execution_time, all_errors)
     
     display_results(output)
     
