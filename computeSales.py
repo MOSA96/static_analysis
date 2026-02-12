@@ -25,18 +25,18 @@ def load_json_file(filename: str) -> Dict:
         Parsed JSON data as a dictionary
 
     Raises:
-        FileNotFoundError: If file doesn't exist
+        FileNotFoundError: If file doesn"t exist
         json.JSONDecodeError: If JSON is malformed
     """
     try:
-        with open(filename, 'r', encoding='utf-8') as file:
+        with open(filename, "r", encoding="utf-8") as file:
             data = json.load(file)
             return data
     except FileNotFoundError:
-        raise FileNotFoundError(f'File not found {filename}')
+        raise FileNotFoundError(f"File not found {filename}")
     except json.JSONDecodeError as e:
         raise json.JSONDecodeError(
-            f'Invalid JSON format for {filename}: {e.msg}'
+            f"Invalid JSON format for {filename}: {e.msg}"
         )
 
 
@@ -66,7 +66,7 @@ def load_sales_record(filename: str) -> List:
     return load_json_file(filename)
 
 
-def compute_sale_total(sale: Dict, sales_dict: Dict) -> Tuple[float, List[str]]:
+def compute_sale_total(sales_dict: Dict, prices_dict: Dict) -> Tuple[float, List[str]]:
     """
     Compute the total cost for a single sale.
 
@@ -77,7 +77,52 @@ def compute_sale_total(sale: Dict, sales_dict: Dict) -> Tuple[float, List[str]]:
     Returns:
         Tuple of (total_cost, list_of_errors)
     """
-    pass
+    errors = []
+    total = 0.0
+
+    try:
+        sale_id = sales_dict.get("SALE_ID", "Unknown")
+        sale_data = sales_dict.get("SALE_Date", "Unknown")
+        product = sales_dict.get("Product", None)
+        quantity = sales_dict.get("Quantity", None)
+
+        #validation
+        if product is None:
+            errors.append(f"Missing product information")
+        
+        if quantity is None:
+            errors.append(f"Missing quantity information")
+        
+        try:
+            quantity = float(quantity)
+            if quantity < 0:
+                errors.append(f"Sale {sale_id}: Negative quantity ({quantity})")
+                return 0.0, errors
+        except (ValueError, TypeError):
+            errors.append(f"Sale {sale_id}: Invalid quantity value ({quantity})")
+            return 0.0, errors
+
+        price = sales_dict[product]
+        try:
+            price = float(price)
+            if price < 0:
+                errors.append(f"Sale {sale_id}: Negative price for product '{product}'")
+                return 0.0, errors
+        except (ValueError, TypeError):
+            errors.append(f"Sale {sale_id}: Invalid price for product '{product}'")
+            return 0.0, errors
+
+        total = price * quantity
+
+    except Exception as e:
+        errors.append(f"Sale {sales_dict.get("Sale", "Unknown")}: Unexpected error - {str(e)}")
+        return 0.0, errors
+
+    return total, errors
+        
+
+        
+
 
 
 def compute_all_sales(sales_records: List, sales_dict: Dict) -> Tuple[float, int, List[str]]:
@@ -139,20 +184,20 @@ def parse_arguments():
         Namespace object with parsed arguments
     """
     parser = argparse.ArgumentParser(
-        description='Compute total cost of sales based on price and sales records.',
-        epilog='Example: python computeSales.py price.json sales.json'
+        description="Compute total cost of sales based on price and sales records.",
+        epilog="Example: python computeSales.py price.json sales.json"
     )
     
     parser.add_argument(
-        'price_file',
+        "price_file",
         type=str,
-        help='Path to the price JSON file'
+        help="Path to the price JSON file"
     )
     
     parser.add_argument(
-        'sales_file',
+        "sales_file",
         type=str,
-        help='Path to the sales JSON file'
+        help="Path to the sales JSON file"
     )
     
     return parser.parse_args()
