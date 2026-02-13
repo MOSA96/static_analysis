@@ -1,5 +1,5 @@
 """
-computeSales.py 
+computeSales.py
 
 This program computes the total cost of sales based on a price catalogue
 and sales records provided in two different JSON format.
@@ -75,7 +75,8 @@ def load_sales_record(filename: str) -> List:
     return load_json_file(filename)
 
 
-def compute_sale_total(sale: Dict, prices_dict: Dict) -> Tuple[float, List[str]]:
+def compute_sale_total(
+        sale: Dict, prices_dict: Dict) -> Tuple[float, List[str]]:
     """
     Compute the total cost for a single sale.
 
@@ -96,47 +97,49 @@ def compute_sale_total(sale: Dict, prices_dict: Dict) -> Tuple[float, List[str]]
 
         # validation
         if product is None:
-            errors.append(f"Missing product information")
+            errors.append("Missing product information")
             return 0.0, errors
 
         if quantity is None:
-            errors.append(f"Missing quantity information")
-            return 0.0, errors
-
-        try:
-            quantity = float(quantity)
-            if quantity < 0:
-                errors.append(f"Sale {sale_id}: Negative quantity ({quantity})")
-                return 0.0, errors
-        except (ValueError, TypeError):
-            errors.append(f"Sale {sale_id}: Invalid quantity value ({quantity})")
+            errors.append("Missing quantity information")
             return 0.0, errors
 
         if product not in prices_dict:
-            errors.append(f"Sale {sale_id}: Product '{product}' not found in price catalogue")
+            errors.append(
+                        f"Sale {sale_id}: Product '{product}' not found in "
+                        "price catalogue"
+                        )
             return 0.0, errors
 
         price = prices_dict[product]
         try:
             price = float(price)
             if price < 0:
-                errors.append(f"Sale {sale_id}: Negative price for product '{product}'")
+                errors.append(
+                    f"Sale {sale_id}: Negative price for product '{product}'"
+                    )
                 return 0.0, errors
         except (ValueError, TypeError):
-            errors.append(f"Sale {sale_id}: Invalid price for product '{product}'")
+            errors.append(
+                f"Sale {sale_id}: Invalid price for product '{product}'"
+                )
             return 0.0, errors
 
         total = price * quantity
 
     except Exception as e:
-        errors.append(f"Sale {sale.get('Sale', 'Unknown')}: Unexpected error - {str(e)}")
+        errors.append(
+            f"Sale {sale.get('Sale', 'Unknown')}:"
+            f"Unexpected error - {str(e)}"
+            )
         return 0.0, errors
 
     return total, errors
-        
 
-    
-def compute_all_sales(sales_records: List, prices_dict: Dict) -> Tuple[float, List[str]]:
+
+def compute_all_sales(
+        sales_records: List,
+        prices_dict: Dict) -> Tuple[float, List[str]]:
     """
     Compute total cost for all sales.
 
@@ -173,7 +176,7 @@ def compute_all_sales(sales_records: List, prices_dict: Dict) -> Tuple[float, Li
     return total, errors
 
 
-def format_output(total: float, execution_time: float, 
+def format_output(total: float, execution_time: float,
                   errors: list[str]) -> str:
     """
     Format the results in a human-readable format.
@@ -200,7 +203,7 @@ def format_output(total: float, execution_time: float,
     if errors:
         output_lines.append("=" * 60)
         output_lines.append(f"ERRORS ENCOUNTERED: {len(errors)}")
-        
+
         for idx, error in enumerate(errors, 1):
             output_lines.append(f'{idx}: {error}')
         output_lines.append("")
@@ -208,8 +211,9 @@ def format_output(total: float, execution_time: float,
     return "\n".join(output_lines)
 
 
-
-def write_results_to_file(output: str, filename: str = "SalesResults.txt") -> None:
+def write_results_to_file(
+        output: str,
+        filename: str = "SalesResults.txt") -> None:
     """
     Write the results to a text file.
 
@@ -239,22 +243,22 @@ def parse_arguments():
         Namespace object with parsed arguments
     """
     parser = argparse.ArgumentParser(
-        description="Compute total cost of sales based on price and sales records.",
+        description="Total cost of sales based on price and sales records.",
         epilog="Example: python computeSales.py price.json sales.json"
     )
-    
+
     parser.add_argument(
         "price_file",
         type=str,
         help="Path to the price JSON file"
     )
-    
+
     parser.add_argument(
         "sales_file",
         type=str,
         help="Path to the sales JSON file"
     )
-    
+
     return parser.parse_args()
 
 
@@ -263,44 +267,44 @@ def main():
     Main function to orchestrate the sales computation process.
     """
     start_time = time.time()
-    
+
     # Parse command line arguments
     args = parse_arguments()
-    
+
     price_file = args.price_file
     sales_file = args.sales_file
-    
+
     all_errors = []
-    
+
     try:
         prices_dict = load_price_catalogue(price_file)
     except Exception as e:
         print(f"Error loading price file: {e}")
         all_errors.append(f"Price file error: {e}")
         prices_dict = {}
-    
+
     try:
         sales = load_sales_record(sales_file)
     except Exception as e:
         print(f"Error loading sales file: {e}")
         all_errors.append(f"Sales file error: {e}")
         sales = []
-    
+
     total, computation_errors = compute_all_sales(
         sales, prices_dict
     )
     all_errors.extend(computation_errors)
-    
+
     end_time = time.time()
     execution_time = end_time - start_time
-    
+
     output = format_output(total, execution_time, all_errors)
-    
+
     display_results(output)
-    
+
     try:
         write_results_to_file(output)
-        print(f"\nResults have been saved to SalesResults.txt")
+        print("\nResults have been saved to SalesResults.txt")
     except Exception as e:
         print(f"Error writing results to file: {e}")
 
