@@ -22,7 +22,7 @@ jobs:
         run: uv python install
       
       - name: Sync uv
-        run: uv Sync
+        run: uv sync
 
       - name: Run ${{ matrix.linter }}
         run: uv run ${{ matrix.linter }} compute_sales.py
