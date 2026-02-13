@@ -19,7 +19,7 @@ jobs:
           enable-cache: true
 
       - name: Install Python
-        run: uv python Install
+        run: uv python install
       
       - name: Sync uv
         run: uv Sync
