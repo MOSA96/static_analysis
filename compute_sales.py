@@ -109,7 +109,7 @@ def compute_sale_total(
         if product not in prices_dict:
             errors.append(
                         f"Sale {sale_id}: Product '{product}' not found in "
-                        "price catalogue"
+                        "price file"
                         )
             return 0.0, errors
 
