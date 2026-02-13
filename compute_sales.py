@@ -280,14 +280,14 @@ def main():
 
     try:
         prices_dict = load_price_catalogue(price_file)
-    except Exception as e:
+    except (KeyError, ValueError, TypeError) as e:
         print(f"Error loading price file: {e}")
         all_errors.append(f"Price file error: {e}")
         prices_dict = {}
 
     try:
         sales = load_sales_record(sales_file)
-    except Exception as e:
+    except (KeyError, ValueError, TypeError) as e:
         print(f"Error loading sales file: {e}")
         all_errors.append(f"Sales file error: {e}")
         sales = []
@@ -307,7 +307,7 @@ def main():
     try:
         write_results_to_file(output)
         print("\nResults have been saved to SalesResults.txt")
-    except Exception as e:
+    except (KeyError, ValueError, TypeError) as e:
         print(f"Error writing results to file: {e}")
 
 
