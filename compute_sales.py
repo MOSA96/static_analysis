@@ -116,11 +116,6 @@ def compute_sale_total(
         price = prices_dict[product]
         try:
             price = float(price)
-            if price < 0:
-                errors.append(
-                    f"Sale {sale_id}: Negative price for product '{product}'"
-                    )
-                return 0.0, errors
         except (KeyError, ValueError, TypeError):
             errors.append(
                 f"Sale {sale_id}: Invalid price for product '{product}'"
@@ -129,7 +124,7 @@ def compute_sale_total(
 
         total = price * quantity
 
-    except  (KeyError, ValueError, TypeError) as e:
+    except (KeyError, ValueError, TypeError) as e:
         errors.append(
             f"Sale {sale.get('Sale', 'Unknown')}:"
             f"Unexpected error - {str(e)}"
